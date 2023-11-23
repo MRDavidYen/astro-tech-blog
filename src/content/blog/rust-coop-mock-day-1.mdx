@@ -1,0 +1,60 @@
+---
+title: 'Collaborative Mock Server - Day 1'
+description: 'The motivation of the Mock Server and the Architecture'
+pubDate: 'Nov 12 2023'
+heroImage: 'https://rs.petwarminfo.com/coop-mock-rust.webp'
+category: 'Rust Learning'
+tags: [rust, actix-web, diesel, next.js, typescript]
+---
+# The Collaboration focused Mock Server
+
+## Motivation
+First, I want to explain the motivation of this project.
+
+I have been working on several projects that require a Mock Server to integrate with Front-end and Back-end.
+
+Then, I use [WireMock](http://wiremock.org/) to create a Mock Server.
+
+However, I am facing some problems with WireMock.
+WireMock is a great tool, but unfortunately, it is not easy to collaborate with other developers when self-hosting WireMock.
+1. If you does not use WireMock cloud service (which is not free), you need to host the WireMock by yourself.
+2. There is no GUI to manage the Mock Server if you self-hosting WireMock. They only provides GUI for their cloud service.
+3. Self-hosting WireMock does not provides database storage. You need to use file system to store the Mock Server data.
+4. File system is not easy to maintain if you host it on Docker. You need to mount the volume to the host machine.
+
+Then, I recognize there are many Mock tools that need to paid for collaboration features.
+For example, [Mockoon](https://mockoon.com/) and [Postman](https://www.postman.com/).
+
+Some of these tools provides self-hosting or free plan, but they usually have some limitations. (Even they are open-source)
+
+According to the above problems, I want to create a Mock Server that can be easily self-hosted and collaborated with other developers for free and open-source.
+
+Also, I inspired by [wiki.js](https://js.wiki/). Wiki.js is a great open-source KM tool that can be easily self-hosted and collaborated with other developers.
+
+Wiki.js not only provides a great UI, but also provides widely databases support (PostgreSQL, MySQL, MongoDB, MSSQL, etc).
+
+## Architecture
+The Backend is written in Rust and the Frontend is written in Next.js.
+
+The Backend is using Actix-web as the web framework and Diesel as the ORM.
+
+I also follow the Clean Architecture to design the Backend. 
+This is the example from Microsoft: [Microsoft Clean Architecture Example with Actix-web](https://github.com/microsoft/cookiecutter-rust-actix-clean-architecture/tree/main)
+
+How the Clean Architecture in Rust looks like:
+1. The customize `Container` that contains global states and dependencies for the application. like database connections, etc. (You can imagine it as DI container in other languages)
+2. `Controller` layer that contains the HTTP handlers.
+3. `Service` layer that contains the business logic.
+4. `Repository` layer that contains the database operations.
+5. `Domain` layer that contains the domain models.
+
+Follow the Clean Architecture, We can easily maintain the code and test it.
+
+I will discuss the backend Architecture details in future article.
+
+## References
+
+- [Microsoft Clean Architecture Example with Actix-web](https://github.com/microsoft/cookiecutter-rust-actix-clean-architecture/tree/main)
+- [Actix-web](https://actix.rs/)
+- [Diesel (Rust ORM)](https://diesel.rs/)
+- [serde-json](https://github.com/serde-rs/json)
