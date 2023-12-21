@@ -1,0 +1,138 @@
+---
+title: 'High-level to Rust: 高階語言工程師的Rust學習歷程 - Ownership and Scope'
+description: '從頭開始學Rust - ownership and scope'
+pubDate: 'Dec 21 2023'
+heroImage: 'https://rs.petwarminfo.com/learn_rust.webp'
+category: 'Rust Learning'
+tags: [rust, ownership]
+---
+
+
+# 前言
+
+## 為何要使用Rust？
+我是一個曾經開發過.NET 與 NodeJS，對於高階語言的前後端都有一定經驗的全端工程師。
+在這邊記錄一下我在學習Rust的過程，希望能夠幫助到跟我一樣從高階語言學習Rust的工程師們。
+
+在各種高階語言蓬勃發展的當下，為何要使用Rust？這是一個很好的問題，我們可以從以下幾點來思考：
+1. 你是否在意你的系統的效能？
+2. 你是否有遭遇過你的系統在Runtime遇到非預期的錯誤？
+3. 你是否有發生過Compiler 沒有幫你檢查到，但是在Runtime發生的錯誤？
+
+如果你曾經有思考或是遇到過以上幾個問題，Rust會是個好選擇。
+
+## Rust的特性
+Rust是一個系統程式語言，它的特性有以下幾點：
+* 高效能
+* 安全
+* 跨平台
+* 沒有Garbage Collection
+* 獨特的所有權概念
+* 強大的編譯器檢查
+
+# Rust的所有權概念
+Rust的所有權概念是一個非常重要的概念，它是Rust的核心特性之一，也是Rust能夠達到高效能與安全的關鍵。
+
+他捨棄了傳統的Garbage Collection，改用所有權概念來管理記憶體，讓程式在編譯時期就能夠檢查到記憶體的安全性，避免在Runtime發生記憶體的錯誤。
+
+## 所有權的規則
+Rust的所有權規則有以下幾點：
+1. 每個值都有一個變數，這個變數是這個值的所有者。
+2. 同一個時間點，只能有一個變數擁有這個值。
+3. 當變數離開作用域時，這個值會被丟棄。
+
+## 所有權的移轉
+當變數被賦予一個新的變數時，這個值的所有權會被移轉到新的變數上，舊的變數就會失去這個值的所有權。
+
+```rust
+fn main() {
+    let owned_string = String::from("Hello, world!");
+    let copy_string = owned_string; //所有權被移轉到copy_string
+
+    println!("{}", owned_string); // 這行會發生編譯錯誤，因為所有權已經被移轉到copy_string
+}
+```
+
+![所有權的移轉 失敗情況](https://rs.petwarminfo.com/converted/ownership_1.webp)
+
+> 讓我們修正這個錯誤。
+
+```rust
+fn main() {
+    let owned_string = String::from("Hello, world!");
+    let copy_string = owned_string;
+
+    println!("{}", copy_string); //順利印出 Hello, world!
+}
+```
+
+我們在上面將`println!` 的變數改成`copy_string`，這樣就可以順利印出`Hello, world!`。
+
+## 所有權借用(Barrow)
+當我們想要在不移轉所有權的情況下，讓其他變數使用這個值時，我們可以使用所有權借用的方式。
+
+```rust
+fn main() {
+    let owned_string = String::from("Hello, world!");
+    let copy_string = &owned_string; // 這裡使用&來借用owned_string的所有權
+
+    println!("{}", copy_string); // 借用的變數可以正常印出 Hello, world!
+    println!("{}", owned_string); // owned_string還是可以正常使用
+}
+```
+
+## 所有權借用的限制
+所有權借用有以下幾個限制：
+1. 在借用的變數離開作用域前，不能修改借用的變數。
+2. 在借用的變數離開作用域前，不能修改被借用的變數。
+
+```rust
+fn main() {
+    let mut owned_string = String::from("Hello, world!");
+    let copy_string = &owned_string;
+
+    owned_string.push_str("123"); // 這裡會發生編譯錯誤，因為owned_string被借用了
+    println!("{}", copy_string);
+}
+```
+
+## 作用域 (Scope)
+上面的例子中，我們提到了作用域，作用域是一個變數可以被使用的範圍，當變數離開作用域時，這個變數就會被丟棄。
+
+```rust
+fn main() {
+    let owned_string = String::from("Hello, world!");
+
+    print_something(owned_string); // owned_string被傳入函式中，這裡會發生所有權的移轉, 當函式結束時，owned_string就會被丟棄
+
+    println!("{}", owned_string); // 這裡會發生編譯錯誤，因為owned_string已經離開作用域
+}
+
+fn print_something(message: String) {
+    println!("{}", message); // 從函式中印出 Hello, world!, 這裡的message是owned_string的所有者
+} 
+```
+
+從上述的例子可以看到，當我們將`owned_string` 傳入`print_something`函式中時，`owned_string`的所有權就會被移轉到`message`上，當函式結束時，`message`就會被丟棄，這時`owned_string`也會被丟棄。
+
+那麼我們要如何在函式中使用變數，又不會發生所有權的移轉呢？我們可以使用所有權借用的方式。
+
+```rust
+fn main() {
+    let owned_string = String::from("Hello, world!");
+
+    print_something(&owned_string); // 這裡使用&來借用owned_string的所有權
+
+    println!("{}", owned_string); // owned_string還是可以正常印出 Hello, world!
+}
+
+fn print_something(message: &String) { // 這裡使用&來借用owned_string的所有權
+    println!("{}", message); // 從函式中印出 Hello, world!, 這裡的message是owned_string的借用者
+}
+```
+
+## 後記
+
+Rust 中文社群的資源相對較少，希望可以在這邊記錄一些來自高階語言開發者的學習心得。也希望Rust中文社群能夠更加強大。
+
+下一個章節我們會介紹Rust 的 Immutable 與 Mutable概念，謝謝。

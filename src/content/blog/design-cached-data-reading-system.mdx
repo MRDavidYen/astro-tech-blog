@@ -1,12 +1,30 @@
 ---
-title: 'Design of a Cached Data Reading System'
+title: '如何使用'
 description: 'A system that reads data from a database and caches it in Redis for fast retrieval'
 pubDate: 'Nov 24 2023'
 heroImage: 'https://rs.petwarminfo.com/cached-data-reading-system.webp'
 category: 'System Design'
+draft: true
 tags: [system-design, redis, database]
 ---
 
 # Design of a Cached Data Reading System
 
-## Introduction
+## Intro
+
+I am working on a E-commerce company, and the company has a lot of products with complex logics, stock level, price, sales.
+
+We also need to make sure the performance of website is acceptable, so we need to cache the data in Redis.
+
+## Situation
+Our service mostly host on Azure.
+
+1. Database: Microsoft SQL Server. The most expensive part of our system.
+2. Cache: Redis. We use Azure Redis Cache with C2 tier. It provides 99.9% SLA.
+3. Web Server: ASP.NET MVC. This is a legacy system, and we are implementing progressive enhancement to ASP.NET Core.
+4. Product Service: The Core of this article. It is a service that manages the product data and Redis Cache.
+
+## Limitation
+
+Since we have a ASP.NET MVC website, it is not easy to implement a cache system.
+
