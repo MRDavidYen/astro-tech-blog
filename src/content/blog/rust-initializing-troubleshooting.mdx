@@ -1,0 +1,40 @@
+---
+title: 'Rust troubleshooting - Diesel ORM and Postgres'
+description: '在使用新的Apple Silicon 晶片的Macbook Pro上，安裝Rust的Diesel ORM時，遇到了一些問題，這裡記錄一下'
+pubDate: 'Dec 23 2023'
+heroImage: 'https://rs.petwarminfo.com/converted/rust-troubleshooting.webp'
+category: 'Rust Learning'
+tags: [rust, Mac, Apple]
+---
+
+# 啟動Rust 專案時遇到的問題
+最近剛好更換Apple Silicon 晶片的Macbook，重新安裝了Rust環境。剛好有遇到以前使用Intel Chip時沒遇到過的問題。
+在這邊記錄一下。
+
+專案使用了Diesel ORM，並且使用Postgres作為資料庫。
+
+## Diesel ORM 使用 Postgres
+在剛下載好的專案資料夾內使用 `cargo build` 建置專案。
+
+遇到了以下的錯誤訊息
+```bash
+ld: library not found for pq
+          error: linker command failed with exit code 1 
+```
+
+經過一番查找後發現是Diesel 開啟Postgres的功能時，需要搭配libpq 這個C語言函式庫。
+
+除此之外，還需要安裝Postgres。
+
+可以選擇透過Homebrew安裝
+```bash
+brew install libpq postgresql@15 && brew link --force libpq
+```
+
+安裝後，由於cargo 是有cache的，必須先清除cache，才能正確的編譯專案。
+```bash
+cargo clean
+```
+```bash
+cargo build
+```
